@@ -47,21 +47,39 @@ export function Dashboard({ onNavigate }: Props) {
     { icon: ShieldCheck, title: i.feature6Title, body: i.feature6Body },
   ];
 
+  const gallery = [
+    { src: IMAGES.lobby, label: i.imgLobby },
+    { src: IMAGES.camera, label: i.imgCamera },
+    { src: IMAGES.corridor, label: i.imgCorridor },
+    { src: IMAGES.control, label: i.imgControl },
+    { src: IMAGES.hotel, label: i.imgHotel },
+    { src: IMAGES.parking, label: i.imgParking },
+  ];
+
   return (
     <div className="intro-page">
       <section className="intro-hero" aria-label={i.heroAlt}>
-        <img src={IMAGES.hero} alt="" className="intro-hero-img" loading="eager" draggable={false} />
+        <img
+          src={IMAGES.hero}
+          alt=""
+          className="intro-hero-img"
+          loading="eager"
+          draggable={false}
+        />
         <div className="intro-hero-overlay" />
         <div className="intro-hero-content">
-          <p className="intro-eyebrow">{i.eyebrow}</p>
           <h1>{i.title}</h1>
           <p className="intro-sub">{i.subtitle}</p>
           <div className="intro-actions">
-            <button type="button" className="btn btn-primary" onClick={() => onNavigate('operations')}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => onNavigate('operations')}
+            >
               {i.ctaOps}
               <ArrowRight size={16} />
             </button>
-            <button type="button" className="btn intro-btn-ghost" onClick={openLive}>
+            <button type="button" className="btn" onClick={openLive}>
               <Video size={16} />
               {i.ctaScenario}
             </button>
@@ -69,87 +87,58 @@ export function Dashboard({ onNavigate }: Props) {
         </div>
       </section>
 
-      <section className="intro-status" aria-label="Project status">
-        <div className="intro-status-item">
-          <span className="intro-status-value">30</span>
-          <span className="intro-status-label">Safire E1</span>
+      <section className="intro-kpi-row">
+        <div className="intro-kpi-card">
+          <strong>30</strong>
+          <span>Safire E1</span>
         </div>
-        <div className="intro-status-item">
-          <span className="intro-status-value">{online}/30</span>
-          <span className="intro-status-label">{t.online}</span>
+        <div className="intro-kpi-card">
+          <strong>
+            {online}/30
+          </strong>
+          <span>{t.online}</span>
         </div>
-        <div className="intro-status-item">
-          <span className="intro-status-value">{activeRules}</span>
-          <span className="intro-status-label">{t.ops.activeRules}</span>
+        <div className="intro-kpi-card">
+          <strong>{activeRules}</strong>
+          <span>{t.ops.activeRules}</span>
         </div>
-        <div className="intro-status-item">
-          <span className="intro-status-value">Milestone</span>
-          <span className="intro-status-label">+ AI analytics</span>
+        <div className="intro-kpi-card">
+          <strong>VMS</strong>
+          <span>Milestone + AI</span>
         </div>
       </section>
 
-      <section className="intro-capabilities">
-        <aside className="intro-capabilities-aside">
+      <section className="intro-section">
+        <div className="intro-section-head">
           <h2>{i.featuresTitle}</h2>
-          <p>{i.overviewBody}</p>
-          <button type="button" className="btn btn-primary" onClick={() => onNavigate('operations')}>
-            {i.ctaOps}
-            <ArrowRight size={15} />
-          </button>
-        </aside>
-        <ol className="intro-capability-list">
-          {features.map((f, index) => {
+        </div>
+        <div className="intro-features">
+          {features.map((f) => {
             const Icon = f.icon;
             return (
-              <li key={f.title}>
-                <span className="intro-cap-index">{String(index + 1).padStart(2, '0')}</span>
-                <div className="intro-cap-icon">
-                  <Icon size={16} />
+              <article key={f.title} className="intro-feature">
+                <div className="intro-feature-icon">
+                  <Icon size={18} />
                 </div>
-                <div className="intro-cap-copy">
-                  <h3>{f.title}</h3>
-                  <p>{f.body}</p>
-                </div>
-              </li>
+                <h3>{f.title}</h3>
+                <p>{f.body}</p>
+              </article>
             );
           })}
-        </ol>
+        </div>
       </section>
 
-      <section className="intro-visual">
-        <div className="intro-visual-head">
+      <section className="intro-section">
+        <div className="intro-section-head">
           <h2>{i.galleryTitle}</h2>
-          <p>{i.badgeHotel ?? i.eyebrow}</p>
         </div>
-        <div className="intro-visual-layout">
-          <figure className="intro-visual-main">
-            <img src={IMAGES.lobby} alt={i.imgLobby} loading="lazy" draggable={false} />
-            <figcaption>{i.imgLobby}</figcaption>
-          </figure>
-          <div className="intro-visual-side">
-            <figure>
-              <img src={IMAGES.camera} alt={i.imgCamera} loading="lazy" draggable={false} />
-              <figcaption>{i.imgCamera}</figcaption>
+        <div className="intro-gallery">
+          {gallery.map((g) => (
+            <figure key={g.src} className="intro-gallery-item">
+              <img src={g.src} alt={g.label} loading="lazy" draggable={false} />
+              <figcaption>{g.label}</figcaption>
             </figure>
-            <figure>
-              <img src={IMAGES.corridor} alt={i.imgCorridor} loading="lazy" draggable={false} />
-              <figcaption>{i.imgCorridor}</figcaption>
-            </figure>
-          </div>
-          <div className="intro-visual-row">
-            <figure>
-              <img src={IMAGES.control} alt={i.imgControl} loading="lazy" draggable={false} />
-              <figcaption>{i.imgControl}</figcaption>
-            </figure>
-            <figure>
-              <img src={IMAGES.hotel} alt={i.imgHotel} loading="lazy" draggable={false} />
-              <figcaption>{i.imgHotel}</figcaption>
-            </figure>
-            <figure>
-              <img src={IMAGES.parking} alt={i.imgParking} loading="lazy" draggable={false} />
-              <figcaption>{i.imgParking}</figcaption>
-            </figure>
-          </div>
+          ))}
         </div>
       </section>
 

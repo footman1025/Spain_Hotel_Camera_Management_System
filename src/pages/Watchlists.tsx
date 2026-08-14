@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { UserPlus, Trash2, Users, UserCheck, ShieldAlert } from 'lucide-react';
+import { UserPlus, Trash2 } from 'lucide-react';
 import { useDemo, watchlistLabel } from '../store/DemoContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import type { WatchlistType } from '../types';
@@ -37,9 +37,9 @@ export function Watchlists() {
       .slice(0, 2)
       .toUpperCase();
     const colors: Record<WatchlistType, string> = {
-      employees: '#1f7a5c',
-      guests: '#1f5f8b',
-      blocked: '#b42318',
+      employees: '#2d6a4f',
+      guests: '#1d3557',
+      blocked: '#9b2226',
     };
     addPerson({
       name: name.trim(),
@@ -52,70 +52,38 @@ export function Watchlists() {
     setRole('');
   };
 
-  const filters: { id: WatchlistType | 'all'; label: string; count: number; icon: typeof Users }[] = [
-    { id: 'all', label: w.all, count: counts.all, icon: Users },
-    { id: 'employees', label: w.employees, count: counts.employees, icon: UserCheck },
-    { id: 'guests', label: w.guests, count: counts.guests, icon: Users },
-    { id: 'blocked', label: w.blocked, count: counts.blocked, icon: ShieldAlert },
+  const filters: { id: WatchlistType | 'all'; label: string; count: number }[] = [
+    { id: 'all', label: w.all, count: counts.all },
+    { id: 'employees', label: w.employees, count: counts.employees },
+    { id: 'guests', label: w.guests, count: counts.guests },
+    { id: 'blocked', label: w.blocked, count: counts.blocked },
   ];
 
   return (
     <div className="watch-page">
-      <section className="watch-hero">
+      <div className="page-header">
         <div>
           <h1>{w.title}</h1>
           <p>{w.subtitle}</p>
         </div>
-        <div className="watch-hero-stats">
-          <div className="watch-stat">
-            <div>
-              <strong>{counts.employees}</strong>
-              <span>{w.employees}</span>
-            </div>
-          </div>
-          <div className="watch-stat">
-            <div>
-              <strong>{counts.guests}</strong>
-              <span>{w.guests}</span>
-            </div>
-          </div>
-          <div className="watch-stat">
-            <div>
-              <strong>{counts.blocked}</strong>
-              <span>{w.blocked}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
 
       <div className="watch-filters">
-        {filters.map((f) => {
-          const Icon = f.icon;
-          return (
-            <button
-              key={f.id}
-              type="button"
-              className={`watch-filter ${filter === f.id ? 'active' : ''}`}
-              onClick={() => setFilter(f.id)}
-            >
-              <Icon size={14} />
-              <span>{f.label}</span>
-              <em>{f.count}</em>
-            </button>
-          );
-        })}
+        {filters.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            className={`btn btn-sm ${filter === f.id ? 'btn-primary' : ''}`}
+            onClick={() => setFilter(f.id)}
+          >
+            {f.label} ({f.count})
+          </button>
+        ))}
       </div>
 
       <section className="watch-add">
-        <div className="watch-add-head">
-          <div className="watch-add-icon">
-            <UserPlus size={16} />
-          </div>
-          <div>
-            <h2>{w.addTitle}</h2>
-            <p>{w.addHint}</p>
-          </div>
-        </div>
+        <h2>{w.addTitle}</h2>
+        <p>{w.addHint}</p>
         <form className="watch-form" onSubmit={submit}>
           <input
             className="input"

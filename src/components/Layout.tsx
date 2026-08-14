@@ -98,7 +98,7 @@ export function Layout({ page, onNavigate, children }: Props) {
         <div className="topbar-title">{t.titles[page]}</div>
         <div className="topbar-spacer" />
         <div className="lang-switch" title={t.langSwitch}>
-          <Languages size={14} />
+          <Languages size={14} aria-hidden />
           <button
             type="button"
             className={lang === 'es' ? 'active' : ''}
