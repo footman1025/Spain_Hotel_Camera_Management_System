@@ -102,3 +102,6 @@ export type PageId =
   | 'alerts'
   | 'search'
   | 'gdpr';
+
+/** Matches the three operator roles described in the GDPR/AEPD access-control page. */
+export type OperatorRole = 'admin' | 'security' | 'reception';

@@ -1,23 +1,46 @@
 import { useMemo, useState } from 'react';
 import { AlertItem } from '../components/AlertItem';
 import { useDemo } from '../store/DemoContext';
+import { useRole } from '../store/RoleContext';
 import { useLanguage } from '../i18n/LanguageContext';
+import { RECEPTION_ZONES } from '../data/roles';
 import type { AlertSeverity } from '../types';
 
 export function Alerts() {
   const { t } = useLanguage();
-  const { events, acknowledgeEvent, acknowledgeAll } = useDemo();
+  const { events, cameras, acknowledgeEvent, acknowledgeAll } = useDemo();
+  const { role } = useRole();
   const [severity, setSeverity] = useState<AlertSeverity | 'all'>('all');
   const [onlyUnacked, setOnlyUnacked] = useState(false);
   const a = t.alerts;
 
-  const filtered = useMemo(() => {
+  // Reception only sees lobby / check-in alerts, per the GDPR access-control page.
+  const zoneById = useMemo(() => new Map(cameras.map((c) => [c.id, c.zone])), [cameras]);
+  const scopedEvents = useMemo(() => {
+    if (role !== 'reception') return events;
     return events.filter((e) => {
+      const zone = zoneById.get(e.cameraId);
+      return zone ? RECEPTION_ZONES.includes(zone) : false;
+    });
+  }, [events, role, zoneById]);
+
+  const filtered = useMemo(() => {
+    return scopedEvents.filter((e) => {
       if (severity !== 'all' && e.severity !== severity) return false;
       if (onlyUnacked && e.acknowledged) return false;
       return true;
     });
-  }, [events, onlyUnacked, severity]);
+  }, [scopedEvents, onlyUnacked, severity]);
+
+  // Reception's "acknowledge all" should only affect the lobby/check-in alerts it can
+  // see, not every event in the system.
+  const ackVisible = () => {
+    if (role === 'reception') {
+      scopedEvents.filter((e) => !e.acknowledged).forEach((e) => acknowledgeEvent(e.id));
+    } else {
+      acknowledgeAll();
+    }
+  };
 
   return (
     <>
@@ -26,7 +49,7 @@ export function Alerts() {
           <h1>{a.title}</h1>
           <p>{a.subtitle}</p>
         </div>
-        <button className="btn" onClick={acknowledgeAll}>
+        <button className="btn" onClick={ackVisible}>
           {a.ackAll}
         </button>
       </div>

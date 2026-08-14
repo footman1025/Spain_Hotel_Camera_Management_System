@@ -1,7 +1,9 @@
 import { memo, useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { ShieldOff } from 'lucide-react';
 import { FEED_IMAGES } from '../data/feedImages';
+import { useLanguage } from '../i18n/LanguageContext';
 import type { Camera, DetectionOverlay } from '../types';
 
 interface Props {
@@ -11,6 +13,8 @@ interface Props {
   showPersonSilhouette?: boolean;
   large?: boolean;
   onClick?: () => void;
+  /** GDPR privacy mask active for this camera's zone — blurs the feed. */
+  masked?: boolean;
 }
 
 interface LiveTrack {
@@ -72,7 +76,9 @@ function CameraFeedComponent({
   showPersonSilhouette = true,
   large,
   onClick,
+  masked,
 }: Props) {
+  const { t } = useLanguage();
   const camOverlays = overlays.filter((o) => o.cameraId === camera.id);
   const bgImage = FEED_IMAGES[camera.zone] ?? FEED_IMAGES.lobby;
   const offline = camera.status === 'offline';
@@ -141,37 +147,48 @@ function CameraFeedComponent({
       role={onClick ? 'button' : undefined}
       style={large ? { aspectRatio: '16/9', width: '100%', minHeight: 280 } : undefined}
     >
-      <div className={`camera-feed ${camera.zone} ${offline ? 'offline' : ''} ${large ? 'live-motion' : ''}`}>
+      <div
+        className={`camera-feed ${camera.zone} ${offline ? 'offline' : ''} ${large ? 'live-motion' : ''} ${masked && !offline ? 'masked' : ''}`}
+      >
         <FeedBackground src={bgImage} large={large} offline={offline} />
         <div className="feed-dim" />
         <div className="feed-noise" />
         {large && !offline && <div className="feed-scan" aria-hidden />}
-        {showPersonSilhouette && !offline && <div className="feed-person" />}
+        {showPersonSilhouette && !offline && !masked && <div className="feed-person" />}
+        {masked && !offline && (
+          <div className="feed-mask-badge">
+            <ShieldOff size={12} />
+            {t.gdpr.maskBadge}
+          </div>
+        )}
         {camera.hasLine && (
           <div className="virtual-line" data-label={camera.lineLabel ?? 'Línea'} />
         )}
 
-        {tracks.map((t) => (
-          <div
-            key={t.id}
-            className={`overlay-box overlay-moving ${t.kind === 'face' ? 'overlay-face' : ''}`}
-            style={{
-              left: `${t.x}%`,
-              top: `${t.y}%`,
-              width: `${t.w}%`,
-              height: `${t.h}%`,
-              borderColor: t.color,
-              color: t.color,
-              background: `${t.color}18`,
-            }}
-          >
-            <span className="overlay-label" style={{ background: t.color }}>
-              {t.label}
-            </span>
-          </div>
-        ))}
+        {/* Privacy-masked zones don't run facial/line analytics — no overlays shown. */}
+        {!masked &&
+          tracks.map((track) => (
+            <div
+              key={track.id}
+              className={`overlay-box overlay-moving ${track.kind === 'face' ? 'overlay-face' : ''}`}
+              style={{
+                left: `${track.x}%`,
+                top: `${track.y}%`,
+                width: `${track.w}%`,
+                height: `${track.h}%`,
+                borderColor: track.color,
+                color: track.color,
+                background: `${track.color}18`,
+              }}
+            >
+              <span className="overlay-label" style={{ background: track.color }}>
+                {track.label}
+              </span>
+            </div>
+          ))}
 
-        {camOverlays.map((o) =>
+        {!masked &&
+          camOverlays.map((o) =>
           o.kind === 'line_flash' ? (
             <div
               key={o.id}

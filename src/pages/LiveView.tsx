@@ -11,6 +11,7 @@ export function LiveView() {
     events,
     selectedCameraId,
     setSelectedCameraId,
+    maskedZones,
     acknowledgeEvent,
   } = useDemo();
 
@@ -39,6 +40,7 @@ export function LiveView() {
               overlays={overlays}
               large
               showPersonSilhouette
+              masked={maskedZones.includes(camera.zone)}
             />
           </div>
           <div className="panel">
@@ -55,6 +57,7 @@ export function LiveView() {
                     camera={cam}
                     overlays={overlays}
                     selected={cam.id === camera.id}
+                    masked={maskedZones.includes(cam.zone)}
                   />
                 ))}
               </div>

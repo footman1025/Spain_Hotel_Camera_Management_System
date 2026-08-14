@@ -3,12 +3,15 @@ import { format } from 'date-fns';
 import { enUS, es } from 'date-fns/locale';
 import { Download } from 'lucide-react';
 import { useDemo } from '../store/DemoContext';
+import { useRole } from '../store/RoleContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import type { EventType } from '../types';
 
 export function SearchPage() {
   const { t, lang } = useLanguage();
   const { events, cameras, exportEventsCsv } = useDemo();
+  const { role } = useRole();
+  const canExport = role === 'admin';
   const [q, setQ] = useState('');
   const [cameraId, setCameraId] = useState('all');
   const [type, setType] = useState<EventType | 'all'>('all');
@@ -48,10 +51,12 @@ export function SearchPage() {
           <h1>{s.title}</h1>
           <p>{s.subtitle}</p>
         </div>
-        <button className="btn btn-primary" onClick={download}>
-          <Download size={14} />
-          {s.export}
-        </button>
+        {canExport && (
+          <button className="btn btn-primary" onClick={download}>
+            <Download size={14} />
+            {s.export}
+          </button>
+        )}
       </div>
 
       <div className="filters">

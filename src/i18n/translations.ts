@@ -30,6 +30,7 @@ export const translations = {
     },
 
     langSwitch: 'Idioma',
+    roleSwitch: 'Rol de operador',
     online: 'online',
     speedTitle: 'Velocidad del simulador',
     pauseAuto: 'Pausar auto',
@@ -111,6 +112,9 @@ export const translations = {
       gridHint: 'Clic para vista en vivo',
       moreCams: 'cámaras adicionales en planta 2–3, parking y zonas comunes',
       recentEvents: 'Últimos eventos',
+      floorMapTitle: 'Mapa por planta',
+      floorMapHint:
+        'Cámaras organizadas por planta/zona. El punto ámbar indica un evento activo; el punto pequeño superior indica máscara de privacidad. Clic para abrir en Vista en vivo.',
     },
 
     live: {
@@ -248,6 +252,15 @@ export const translations = {
       docs3: 'Matriz de reglas y umbrales de analítica',
       docs4: 'Plantilla EIPD / registro de tratamiento para el hotel',
       docs5: 'Plan de soporte 3–6 meses post-implantación',
+      maskBadge: 'Máscara privacidad',
+      simTitle: 'Configuración en vivo',
+      simHint:
+        'Estos controles son funcionales: afectan a la Vista en vivo y Operaciones en tiempo real, tal y como lo haría Milestone Privacy Mask + política de retención.',
+      simRetentionLabel: 'Retención activa',
+      simMaskLabel: 'Enmascaramiento por zona',
+      simMaskHint: 'Zonas con máscara de privacidad activa (cámaras difuminadas en vivo):',
+      simMaskOn: 'Máscara activa',
+      simMaskOff: 'Sin máscara',
     },
 
     zones: {
@@ -280,6 +293,8 @@ export const translations = {
       lineCross: 'Cruce de línea: {line}',
       ruleNight:
         'REGLA ACTIVADA: Acceso nocturno habitaciones — cruce línea Hab. 214 + rostro desconocido (23:40)',
+      ruleNightSuppressed:
+        'Cruce línea Hab. 214 + rostro desconocido (23:40) — ninguna regla activa coincide, evento solo registrado',
       camOnline: 'Cámara Almacen_01 recuperada — online',
       camOffline: 'Cámara Almacen_01 sin señal',
       motion: 'Movimiento detectado en {camera}',
@@ -321,6 +336,7 @@ export const translations = {
     },
 
     langSwitch: 'Language',
+    roleSwitch: 'Operator role',
     online: 'online',
     speedTitle: 'Simulator speed',
     pauseAuto: 'Pause auto',
@@ -402,6 +418,9 @@ export const translations = {
       gridHint: 'Click for live view',
       moreCams: 'more cameras on floors 2–3, parking and common areas',
       recentEvents: 'Recent events',
+      floorMapTitle: 'Floor map',
+      floorMapHint:
+        'Cameras organized by floor/zone. The amber dot marks an active event; the small top-right dot marks a privacy mask. Click to open in Live view.',
     },
 
     live: {
@@ -537,6 +556,15 @@ export const translations = {
       docs3: 'Analytics rules and threshold matrix',
       docs4: 'DPIA / processing record template for the hotel',
       docs5: '3–6 months post-deployment support plan',
+      maskBadge: 'Privacy mask',
+      simTitle: 'Live configuration',
+      simHint:
+        'These controls are functional: they affect Live view and Operations in real time, the way Milestone Privacy Mask + a retention policy would.',
+      simRetentionLabel: 'Active retention',
+      simMaskLabel: 'Zone masking',
+      simMaskHint: 'Zones with an active privacy mask (blurred on live cameras):',
+      simMaskOn: 'Mask active',
+      simMaskOff: 'No mask',
     },
 
     zones: {
@@ -569,6 +597,8 @@ export const translations = {
       lineCross: 'Line crossing: {line}',
       ruleNight:
         'RULE TRIGGERED: Night room access — Room 214 line cross + unknown face (23:40)',
+      ruleNightSuppressed:
+        'Room 214 line cross + unknown face (23:40) — no active rule matched, event logged only',
       camOnline: 'Camera Almacen_01 recovered — online',
       camOffline: 'Camera Almacen_01 no signal',
       motion: 'Motion detected on {camera}',

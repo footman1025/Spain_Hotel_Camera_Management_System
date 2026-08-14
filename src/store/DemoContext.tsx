@@ -5,7 +5,9 @@ import { DEFAULT_RULES } from '../data/rules';
 import { interpolate, translations } from '../i18n/translations';
 import type {
   Camera,
+  CameraZone,
   DetectionOverlay,
+  EventType,
   Person,
   SecurityEvent,
   SecurityRule,
@@ -37,7 +39,13 @@ interface DemoContextValue {
   removePerson: (id: string) => void;
   unreadCritical: number;
   exportEventsCsv: () => string;
+  retentionDays: 30 | 60 | 90;
+  setRetentionDays: (days: 30 | 60 | 90) => void;
+  maskedZones: CameraZone[];
+  toggleZoneMask: (zone: CameraZone) => void;
 }
+
+const DEFAULT_MASKED_ZONES: CameraZone[] = ['pool'];
 
 const DemoContext = createContext<DemoContextValue | null>(null);
 
@@ -49,15 +57,69 @@ function nowIso() {
   return new Date().toISOString();
 }
 
-function nightTimeStamp() {
+function nightDate() {
   const d = new Date();
   d.setHours(23, 40 + Math.floor(Math.random() * 10), Math.floor(Math.random() * 60), 0);
-  return d.toISOString();
+  return d;
 }
 
 function roleFor(person: Person, lang: 'es' | 'en') {
   const map = translations[lang].roles as Record<string, string>;
   return map[person.id] ?? person.role;
+}
+
+function toMinutes(hhmm: string) {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+}
+
+/** Time-window check that supports ranges crossing midnight (e.g. 22:00–06:00). */
+function isWithinWindow(date: Date, start: string, end: string) {
+  const minutes = date.getHours() * 60 + date.getMinutes();
+  const startMin = toMinutes(start);
+  const endMin = toMinutes(end);
+  if (startMin <= endMin) return minutes >= startMin && minutes <= endMin;
+  return minutes >= startMin || minutes <= endMin;
+}
+
+interface RuleMatchParams {
+  eventType: EventType;
+  watchlist?: WatchlistType | 'unknown';
+  zone: CameraZone;
+  /** Whether this event is associated with a virtual line crossing. */
+  lineCrossed: boolean;
+  at?: Date;
+}
+
+/**
+ * Finds the first enabled rule (list order = priority) whose condition matches an
+ * incoming simulated event. This is what makes the Rules page functional: toggling a
+ * rule off here actually changes whether/how the corresponding alert is delivered,
+ * mirroring how Milestone XProtect Rules + Alarm Manager would route the same event.
+ */
+function matchRule(rules: SecurityRule[], params: RuleMatchParams): SecurityRule | null {
+  const at = params.at ?? new Date();
+  return (
+    rules.find((rule) => {
+      if (!rule.enabled) return false;
+      const c = rule.condition;
+      if (c.eventType !== 'any' && c.eventType !== params.eventType) return false;
+      if (c.watchlist && c.watchlist !== 'any' && c.watchlist !== (params.watchlist ?? 'unknown')) {
+        return false;
+      }
+      if (c.zones && c.zones.length > 0 && !c.zones.includes(params.zone)) return false;
+      if (rule.requireLineCross && !params.lineCrossed) return false;
+      if (!isWithinWindow(at, c.timeStart, c.timeEnd)) return false;
+      return true;
+    }) ?? null
+  );
+}
+
+function channelsForRule(rule: SecurityRule): SecurityEvent['channels'] {
+  const channels: SecurityEvent['channels'] = ['app'];
+  if (rule.notifyWhatsApp) channels.push('whatsapp');
+  if (rule.notifySms) channels.push('sms');
+  return channels;
 }
 
 export function DemoProvider({ children }: { children: ReactNode }) {
@@ -72,6 +134,14 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const [scenarioActive, setScenarioActive] = useState(false);
   const [scenarioKey, setScenarioKey] = useState<ScenarioKey>('');
   const scenarioTimers = useRef<number[]>([]);
+  const [retentionDays, setRetentionDays] = useState<30 | 60 | 90>(30);
+  const [maskedZones, setMaskedZones] = useState<CameraZone[]>(DEFAULT_MASKED_ZONES);
+
+  const toggleZoneMask = useCallback((zone: CameraZone) => {
+    setMaskedZones((prev) =>
+      prev.includes(zone) ? prev.filter((z) => z !== zone) : [...prev, zone],
+    );
+  }, []);
 
   const pushEvent = useCallback(
     (event: Omit<SecurityEvent, 'id' | 'timestamp' | 'acknowledged'> & { timestamp?: string }) => {
@@ -110,10 +180,14 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         w: 18,
         h: 32,
       });
-      const channels: SecurityEvent['channels'] = ['app'];
-      if (person.watchlist === 'blocked') {
-        channels.push('whatsapp', 'sms');
-      }
+      const rule = matchRule(rules, {
+        eventType: 'face_match',
+        watchlist: person.watchlist,
+        zone: camera.zone,
+        lineCrossed: false,
+      });
+      const channels = rule ? channelsForRule(rule) : (['app'] as SecurityEvent['channels']);
+      const eventSeverity = rule ? rule.severity : severity;
       const esMsg = interpolate(translations.es.events.faceMatch, {
         name: person.name,
         role: roleFor(person, 'es'),
@@ -126,7 +200,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       });
       pushEvent({
         type: 'face_match',
-        severity: person.watchlist === 'blocked' ? 'critical' : severity,
+        severity: eventSeverity,
         cameraId: camera.id,
         cameraName: camera.name,
         personId: person.id,
@@ -137,11 +211,11 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         channels,
       });
     },
-    [addOverlay, pushEvent],
+    [addOverlay, pushEvent, rules],
   );
 
   const emitUnknownFace = useCallback(
-    (camera: Camera) => {
+    (camera: Camera, lineCrossed = false) => {
       addOverlay({
         cameraId: camera.id,
         kind: 'face',
@@ -152,18 +226,28 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         w: 16,
         h: 30,
       });
+
+      const rule = matchRule(rules, {
+        eventType: 'face_unknown',
+        watchlist: 'unknown',
+        zone: camera.zone,
+        lineCrossed,
+      });
+      const channels = rule ? channelsForRule(rule) : (['app'] as SecurityEvent['channels']);
+      const eventSeverity = rule ? rule.severity : 'warning';
+
       pushEvent({
         type: 'face_unknown',
-        severity: 'warning',
+        severity: eventSeverity,
         cameraId: camera.id,
         cameraName: camera.name,
         message: interpolate(translations.es.events.unknownFace, { camera: camera.name }),
         messageEn: interpolate(translations.en.events.unknownFace, { camera: camera.name }),
-        notified: false,
-        channels: ['app'],
+        notified: channels.length > 1,
+        channels,
       });
     },
-    [addOverlay, pushEvent],
+    [addOverlay, pushEvent, rules],
   );
 
   const emitLineCross = useCallback(
@@ -181,21 +265,30 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         h: 2,
         ttl: 2500,
       });
+
+      const rule = matchRule(rules, {
+        eventType: 'line_cross',
+        zone: camera.zone,
+        lineCrossed: true,
+      });
+      const channels = rule ? channelsForRule(rule) : (['app'] as SecurityEvent['channels']);
+      const eventSeverity = rule ? rule.severity : camera.zone === 'room_door' ? 'warning' : 'info';
+
       pushEvent({
         type: 'line_cross',
-        severity: camera.zone === 'room_door' ? 'warning' : 'info',
+        severity: eventSeverity,
         cameraId: camera.id,
         cameraName: camera.name,
         message: interpolate(translations.es.events.lineCross, { line }),
         messageEn: interpolate(translations.en.events.lineCross, { line }),
-        notified: false,
-        channels: ['app'],
+        notified: channels.length > 1,
+        channels,
       });
       if (withUnknown) {
-        window.setTimeout(() => emitUnknownFace(camera), 400);
+        window.setTimeout(() => emitUnknownFace(camera, true), 400);
       }
     },
-    [addOverlay, emitUnknownFace, pushEvent],
+    [addOverlay, emitUnknownFace, pushEvent, rules],
   );
 
   const emitCriticalNightScenario = useCallback(() => {
@@ -203,19 +296,45 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     setSelectedCameraId(camera.id);
     emitLineCross(camera, true);
     window.setTimeout(() => {
-      pushEvent({
-        type: 'rule_trigger',
-        severity: 'critical',
-        cameraId: camera.id,
-        cameraName: camera.name,
-        message: translations.es.events.ruleNight,
-        messageEn: translations.en.events.ruleNight,
-        timestamp: nightTimeStamp(),
-        notified: true,
-        channels: ['app', 'whatsapp', 'sms'],
+      const night = nightDate();
+      const rule = matchRule(rules, {
+        eventType: 'face_unknown',
+        watchlist: 'unknown',
+        zone: camera.zone,
+        lineCrossed: true,
+        at: night,
       });
+
+      // Whether this fires as a critical alert (and how it's routed) now depends on
+      // whether the matching rule is actually enabled on the Rules page — toggle
+      // "Acceso nocturno habitaciones" off and re-run the scenario to see the difference.
+      pushEvent(
+        rule
+          ? {
+              type: 'rule_trigger',
+              severity: rule.severity,
+              cameraId: camera.id,
+              cameraName: camera.name,
+              message: translations.es.events.ruleNight,
+              messageEn: translations.en.events.ruleNight,
+              timestamp: night.toISOString(),
+              notified: true,
+              channels: channelsForRule(rule),
+            }
+          : {
+              type: 'rule_trigger',
+              severity: 'info',
+              cameraId: camera.id,
+              cameraName: camera.name,
+              message: translations.es.events.ruleNightSuppressed,
+              messageEn: translations.en.events.ruleNightSuppressed,
+              timestamp: night.toISOString(),
+              notified: false,
+              channels: ['app'],
+            },
+      );
     }, 900);
-  }, [cameras, emitLineCross, pushEvent]);
+  }, [cameras, emitLineCross, pushEvent, rules]);
 
   const clearScenarioTimers = useCallback(() => {
     scenarioTimers.current.forEach((t) => window.clearTimeout(t));
@@ -510,6 +629,10 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     removePerson,
     unreadCritical,
     exportEventsCsv,
+    retentionDays,
+    setRetentionDays,
+    maskedZones,
+    toggleZoneMask,
   };
 
   return <DemoContext.Provider value={value}>{children}</DemoContext.Provider>;

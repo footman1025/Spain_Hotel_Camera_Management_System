@@ -281,6 +281,23 @@ a {
   font-size: 13px;
 }
 
+.ops-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ops-auto-hint {
+  margin: -10px 0 14px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+}
+
 /* ——— Buttons ——— */
 .btn {
   display: inline-flex;
@@ -412,6 +429,98 @@ a {
 
 .stat-value.bad {
   color: var(--danger);
+}
+
+/* ——— Floor map ——— */
+.floor-map {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.floor-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.floor-row-label {
+  flex: 0 0 64px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.floor-row-cams {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cam-dot {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--panel);
+  cursor: pointer;
+}
+
+.cam-dot:hover {
+  border-color: var(--accent);
+}
+
+.cam-dot-core {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.cam-dot.online .cam-dot-core {
+  background: var(--accent);
+}
+
+.cam-dot.recording .cam-dot-core {
+  background: var(--success);
+}
+
+.cam-dot.offline .cam-dot-core {
+  background: var(--danger);
+}
+
+.cam-dot.event {
+  border-color: var(--warning);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.25);
+  animation: cam-dot-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes cam-dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(201, 162, 39, 0.35);
+  }
+}
+
+.cam-dot-mask {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--warning);
+  border: 1px solid var(--bg);
 }
 
 .two-col {
@@ -583,6 +692,29 @@ a {
 .camera-feed.offline .feed-person,
 .camera-feed.offline .feed-scan {
   display: none;
+}
+
+.camera-feed.masked .feed-bg-img {
+  filter: blur(14px) saturate(0.6) brightness(0.75);
+  transform: scale(1.08);
+}
+
+.feed-mask-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius);
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  pointer-events: none;
 }
 
 .feed-person {

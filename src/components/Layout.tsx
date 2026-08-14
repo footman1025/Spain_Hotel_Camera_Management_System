@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -10,11 +11,15 @@ import {
   Shield,
   Zap,
   Languages,
+  UserCog,
 } from 'lucide-react';
-import type { PageId } from '../types';
+import type { OperatorRole, PageId } from '../types';
 import { useDemo } from '../store/DemoContext';
+import { useRole } from '../store/RoleContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { ToastStack } from './ToastStack';
+
+const ROLE_ORDER: OperatorRole[] = ['admin', 'security', 'reception'];
 
 const NAV_ICONS: Record<PageId, typeof LayoutDashboard> = {
   dashboard: LayoutDashboard,
@@ -53,6 +58,7 @@ const PATH_TO_PAGE: Record<string, PageId> = {
 export function Layout() {
   const { t, lang, setLang } = useLanguage();
   const { unreadCritical, scenarioActive, scenarioKey, cameras } = useDemo();
+  const { role, setRole, canAccess } = useRole();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -62,6 +68,15 @@ export function Layout() {
     scenarioKey && scenarioKey in t.events
       ? t.events[scenarioKey as keyof typeof t.events]
       : '';
+  const visibleNav = NAV_ORDER.filter((id) => canAccess(id));
+
+  // If the active role loses access to the current page (role switched, or a
+  // restricted role deep-links a URL directly), bounce back to a page it can see.
+  useEffect(() => {
+    if (!canAccess(page)) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [page, canAccess, navigate]);
 
   return (
     <div className="app-shell">
@@ -78,7 +93,7 @@ export function Layout() {
           <div className="brand-sub">{t.brandSub}</div>
         </div>
         <nav className="nav">
-          {NAV_ORDER.map((id) => {
+          {visibleNav.map((id) => {
             const Icon = NAV_ICONS[id];
             const to = id === 'dashboard' ? '/dashboard' : `/${id}`;
             return (
@@ -107,6 +122,20 @@ export function Layout() {
       <header className="topbar">
         <div className="topbar-title">{t.titles[page]}</div>
         <div className="topbar-spacer" />
+        <div className="lang-switch" title={t.roleSwitch}>
+          <UserCog size={14} aria-hidden />
+          {ROLE_ORDER.map((r) => (
+            <button
+              key={r}
+              type="button"
+              className={role === r ? 'active' : ''}
+              onClick={() => setRole(r)}
+              title={t.gdpr[r === 'admin' ? 'roleAdminDesc' : r === 'security' ? 'roleSecurityDesc' : 'roleReceptionDesc']}
+            >
+              {t.gdpr[r === 'admin' ? 'roleAdmin' : r === 'security' ? 'roleSecurity' : 'roleReception']}
+            </button>
+          ))}
+        </div>
         <div className="lang-switch" title={t.langSwitch}>
           <Languages size={14} aria-hidden />
           <button
