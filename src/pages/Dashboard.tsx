@@ -38,13 +38,10 @@ export function Dashboard({ onNavigate }: Props) {
     onNavigate('live');
   };
 
-  const primaryFeatures = [
+  const features = [
     { icon: ScanFace, title: i.feature1Title, body: i.feature1Body },
     { icon: GitBranch, title: i.feature2Title, body: i.feature2Body },
     { icon: BellRing, title: i.feature3Title, body: i.feature3Body },
-  ];
-
-  const secondaryFeatures = [
     { icon: Camera, title: i.feature4Title, body: i.feature4Body },
     { icon: FileSearch, title: i.feature5Title, body: i.feature5Body },
     { icon: ShieldCheck, title: i.feature6Title, body: i.feature6Body },
@@ -72,98 +69,87 @@ export function Dashboard({ onNavigate }: Props) {
         </div>
       </section>
 
-      <section className="intro-status" aria-label="System status">
+      <section className="intro-status" aria-label="Project status">
         <div className="intro-status-item">
-          <span className="intro-status-label">Cameras</span>
-          <strong>30</strong>
-          <span className="intro-status-meta">Safire E1</span>
+          <span className="intro-status-value">30</span>
+          <span className="intro-status-label">Safire E1</span>
         </div>
-        <div className="intro-status-divider" aria-hidden />
         <div className="intro-status-item">
+          <span className="intro-status-value">{online}/30</span>
           <span className="intro-status-label">{t.online}</span>
-          <strong>
-            {online}
-            <span className="intro-status-soft">/30</span>
-          </strong>
-          <span className="intro-status-meta">Live feeds</span>
         </div>
-        <div className="intro-status-divider" aria-hidden />
         <div className="intro-status-item">
+          <span className="intro-status-value">{activeRules}</span>
           <span className="intro-status-label">{t.ops.activeRules}</span>
-          <strong>{activeRules}</strong>
-          <span className="intro-status-meta">Event logic</span>
         </div>
-        <div className="intro-status-divider" aria-hidden />
         <div className="intro-status-item">
-          <span className="intro-status-label">Platform</span>
-          <strong className="intro-status-platform">VMS</strong>
-          <span className="intro-status-meta">Milestone + AI</span>
+          <span className="intro-status-value">Milestone</span>
+          <span className="intro-status-label">+ AI analytics</span>
         </div>
       </section>
 
-      <section className="intro-features-block">
-        <aside className="intro-features-lead">
+      <section className="intro-capabilities">
+        <aside className="intro-capabilities-aside">
           <h2>{i.featuresTitle}</h2>
           <p>{i.overviewBody}</p>
-          <ol className="intro-feature-index">
-            {primaryFeatures.map((f, idx) => (
-              <li key={f.title}>
-                <span>{String(idx + 1).padStart(2, '0')}</span>
-                {f.title}
-              </li>
-            ))}
-          </ol>
+          <button type="button" className="btn btn-primary" onClick={() => onNavigate('operations')}>
+            {i.ctaOps}
+            <ArrowRight size={15} />
+          </button>
         </aside>
-        <div className="intro-feature-list">
-          {[...primaryFeatures, ...secondaryFeatures].map((f) => {
+        <ol className="intro-capability-list">
+          {features.map((f, index) => {
             const Icon = f.icon;
             return (
-              <article key={f.title} className="intro-feature-row">
-                <div className="intro-feature-icon" aria-hidden>
-                  <Icon size={18} />
+              <li key={f.title}>
+                <span className="intro-cap-index">{String(index + 1).padStart(2, '0')}</span>
+                <div className="intro-cap-icon">
+                  <Icon size={16} />
                 </div>
-                <div>
+                <div className="intro-cap-copy">
                   <h3>{f.title}</h3>
                   <p>{f.body}</p>
                 </div>
-              </article>
+              </li>
             );
           })}
-        </div>
+        </ol>
       </section>
 
       <section className="intro-visual">
         <div className="intro-visual-head">
           <h2>{i.galleryTitle}</h2>
-          <p>{i.eyebrow}</p>
+          <p>{i.badgeHotel ?? i.eyebrow}</p>
         </div>
-        <div className="intro-visual-grid">
+        <div className="intro-visual-layout">
           <figure className="intro-visual-main">
-            <img src={IMAGES.lobby} alt="" loading="lazy" draggable={false} />
+            <img src={IMAGES.lobby} alt={i.imgLobby} loading="lazy" draggable={false} />
             <figcaption>{i.imgLobby}</figcaption>
           </figure>
-          <div className="intro-visual-stack">
+          <div className="intro-visual-side">
             <figure>
-              <img src={IMAGES.control} alt="" loading="lazy" draggable={false} />
+              <img src={IMAGES.camera} alt={i.imgCamera} loading="lazy" draggable={false} />
+              <figcaption>{i.imgCamera}</figcaption>
+            </figure>
+            <figure>
+              <img src={IMAGES.corridor} alt={i.imgCorridor} loading="lazy" draggable={false} />
+              <figcaption>{i.imgCorridor}</figcaption>
+            </figure>
+          </div>
+          <div className="intro-visual-row">
+            <figure>
+              <img src={IMAGES.control} alt={i.imgControl} loading="lazy" draggable={false} />
               <figcaption>{i.imgControl}</figcaption>
             </figure>
             <figure>
-              <img src={IMAGES.camera} alt="" loading="lazy" draggable={false} />
-              <figcaption>{i.imgCamera}</figcaption>
+              <img src={IMAGES.hotel} alt={i.imgHotel} loading="lazy" draggable={false} />
+              <figcaption>{i.imgHotel}</figcaption>
+            </figure>
+            <figure>
+              <img src={IMAGES.parking} alt={i.imgParking} loading="lazy" draggable={false} />
+              <figcaption>{i.imgParking}</figcaption>
             </figure>
           </div>
-          <figure className="intro-visual-wide">
-            <img src={IMAGES.hotel} alt="" loading="lazy" draggable={false} />
-            <figcaption>{i.imgHotel}</figcaption>
-          </figure>
-          <figure>
-            <img src={IMAGES.corridor} alt="" loading="lazy" draggable={false} />
-            <figcaption>{i.imgCorridor}</figcaption>
-          </figure>
-          <figure>
-            <img src={IMAGES.parking} alt="" loading="lazy" draggable={false} />
-            <figcaption>{i.imgParking}</figcaption>
-          </figure>
         </div>
       </section>
 
