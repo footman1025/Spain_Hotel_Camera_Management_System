@@ -18,6 +18,7 @@ const IMAGES = {
   lobby: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1000&q=80',
   camera: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=1000&q=80',
   corridor: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=80',
+  controlRoom: 'https://www.tecservuk.com/wp-content/uploads/2021/05/8705128684_ddf7589b7a_o-768x512-1-1600x0-c-default.jpg',
 };
 
 export function Dashboard() {
@@ -48,6 +49,7 @@ export function Dashboard() {
     { src: IMAGES.lobby, label: i.imgLobby },
     { src: IMAGES.camera, label: i.imgCamera },
     { src: IMAGES.corridor, label: i.imgCorridor },
+    { src: IMAGES.controlRoom, label: i.imgControlRoom },
   ];
 
   const stats = [
