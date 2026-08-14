@@ -13,7 +13,7 @@ import { useDemo } from '../store/DemoContext';
 import type { PageId } from '../types';
 
 const IMAGES = {
-  hero: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80',
+  hero: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1800&q=80',
   lobby: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=900&q=80',
   camera: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=900&q=80',
   corridor: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80',
@@ -56,6 +56,8 @@ export function Dashboard({ onNavigate }: Props) {
     { src: IMAGES.parking, label: i.imgParking },
   ];
 
+  const phases = [i.phase1, i.phase2, i.phase3, i.phase4, i.phase5];
+
   return (
     <div className="intro-page">
       <section className="intro-hero" aria-label={i.heroAlt}>
@@ -67,45 +69,65 @@ export function Dashboard({ onNavigate }: Props) {
           draggable={false}
         />
         <div className="intro-hero-overlay" />
-        <div className="intro-hero-content">
-          <h1>{i.title}</h1>
-          <p className="intro-sub">{i.subtitle}</p>
-          <div className="intro-actions">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => onNavigate('operations')}
-            >
-              {i.ctaOps}
-              <ArrowRight size={16} />
-            </button>
-            <button type="button" className="btn" onClick={openLive}>
-              <Video size={16} />
-              {i.ctaScenario}
-            </button>
+        <div className="intro-hero-grid">
+          <div className="intro-hero-copy">
+            <p className="intro-kicker">{i.eyebrow}</p>
+            <h1>{i.title}</h1>
+            <p className="intro-sub">{i.subtitle}</p>
+            <div className="intro-actions">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => onNavigate('operations')}
+              >
+                {i.ctaOps}
+                <ArrowRight size={16} />
+              </button>
+              <button type="button" className="btn" onClick={openLive}>
+                <Video size={16} />
+                {i.ctaScenario}
+              </button>
+            </div>
+          </div>
+          <div className="intro-hero-side">
+            <div className="intro-hero-stat">
+              <strong>30</strong>
+              <span>Safire E1</span>
+            </div>
+            <div className="intro-hero-stat">
+              <strong>
+                {online}/30
+              </strong>
+              <span>{t.online}</span>
+            </div>
+            <div className="intro-hero-stat">
+              <strong>{activeRules}</strong>
+              <span>{t.ops.activeRules}</span>
+            </div>
+            <div className="intro-hero-stat">
+              <strong>VMS</strong>
+              <span>Milestone + AI</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="intro-kpi-row">
-        <div className="intro-kpi-card">
-          <strong>30</strong>
-          <span>Safire E1</span>
-        </div>
-        <div className="intro-kpi-card">
-          <strong>
-            {online}/30
-          </strong>
-          <span>{t.online}</span>
-        </div>
-        <div className="intro-kpi-card">
-          <strong>{activeRules}</strong>
-          <span>{t.ops.activeRules}</span>
-        </div>
-        <div className="intro-kpi-card">
-          <strong>VMS</strong>
-          <span>Milestone + AI</span>
-        </div>
+      <section className="intro-split">
+        <article className="panel intro-block">
+          <h2>{i.overviewTitle}</h2>
+          <p>{i.overviewBody}</p>
+        </article>
+        <article className="panel intro-block">
+          <h2>{i.phasesTitle}</h2>
+          <ol className="intro-phases">
+            {phases.map((phase, index) => (
+              <li key={phase}>
+                <span>{index + 1}</span>
+                {phase}
+              </li>
+            ))}
+          </ol>
+        </article>
       </section>
 
       <section className="intro-section">
@@ -117,11 +139,11 @@ export function Dashboard({ onNavigate }: Props) {
             const Icon = f.icon;
             return (
               <article key={f.title} className="intro-feature">
-                <div className="intro-feature-icon">
-                  <Icon size={18} />
+                <Icon size={18} className="intro-feature-icon" />
+                <div>
+                  <h3>{f.title}</h3>
+                  <p>{f.body}</p>
                 </div>
-                <h3>{f.title}</h3>
-                <p>{f.body}</p>
               </article>
             );
           })}
