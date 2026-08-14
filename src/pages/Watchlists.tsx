@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { UserPlus, Trash2, Users, UserCheck, UserX, ShieldAlert } from 'lucide-react';
+import { UserPlus, Trash2, Users, UserCheck, ShieldAlert } from 'lucide-react';
 import { useDemo, watchlistLabel } from '../store/DemoContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import type { WatchlistType } from '../types';
@@ -37,9 +37,9 @@ export function Watchlists() {
       .slice(0, 2)
       .toUpperCase();
     const colors: Record<WatchlistType, string> = {
-      employees: '#2d6a4f',
-      guests: '#1d3557',
-      blocked: '#9b2226',
+      employees: '#1f7a5c',
+      guests: '#1f5f8b',
+      blocked: '#b42318',
     };
     addPerson({
       name: name.trim(),
@@ -67,22 +67,19 @@ export function Watchlists() {
           <p>{w.subtitle}</p>
         </div>
         <div className="watch-hero-stats">
-          <div className="watch-stat tone-teal">
-            <UserCheck size={16} />
+          <div className="watch-stat">
             <div>
               <strong>{counts.employees}</strong>
               <span>{w.employees}</span>
             </div>
           </div>
-          <div className="watch-stat tone-blue">
-            <Users size={16} />
+          <div className="watch-stat">
             <div>
               <strong>{counts.guests}</strong>
               <span>{w.guests}</span>
             </div>
           </div>
-          <div className="watch-stat tone-red">
-            <UserX size={16} />
+          <div className="watch-stat">
             <div>
               <strong>{counts.blocked}</strong>
               <span>{w.blocked}</span>
@@ -157,7 +154,7 @@ export function Watchlists() {
       ) : (
         <div className="person-grid">
           {filtered.map((p) => (
-            <article key={p.id} className={`person-card tone-${p.watchlist}`}>
+            <article key={p.id} className="person-card">
               <div className="avatar" style={{ background: p.photoColor }}>
                 {p.initials}
               </div>

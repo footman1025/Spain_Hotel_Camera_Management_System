@@ -7,7 +7,6 @@ import {
   ShieldCheck,
   ArrowRight,
   Video,
-  MapPin,
 } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useDemo } from '../store/DemoContext';
@@ -40,51 +39,34 @@ export function Dashboard({ onNavigate }: Props) {
   };
 
   const features = [
-    { icon: ScanFace, title: i.feature1Title, body: i.feature1Body, tone: 'teal' },
-    { icon: GitBranch, title: i.feature2Title, body: i.feature2Body, tone: 'blue' },
-    { icon: BellRing, title: i.feature3Title, body: i.feature3Body, tone: 'amber' },
-    { icon: Camera, title: i.feature4Title, body: i.feature4Body, tone: 'blue' },
-    { icon: FileSearch, title: i.feature5Title, body: i.feature5Body, tone: 'teal' },
-    { icon: ShieldCheck, title: i.feature6Title, body: i.feature6Body, tone: 'amber' },
+    { icon: ScanFace, title: i.feature1Title, body: i.feature1Body },
+    { icon: GitBranch, title: i.feature2Title, body: i.feature2Body },
+    { icon: BellRing, title: i.feature3Title, body: i.feature3Body },
+    { icon: Camera, title: i.feature4Title, body: i.feature4Body },
+    { icon: FileSearch, title: i.feature5Title, body: i.feature5Body },
+    { icon: ShieldCheck, title: i.feature6Title, body: i.feature6Body },
   ];
 
   const gallery = [
-    { src: IMAGES.lobby, label: i.imgLobby, wide: true },
-    { src: IMAGES.camera, label: i.imgCamera, wide: false },
-    { src: IMAGES.corridor, label: i.imgCorridor, wide: false },
-    { src: IMAGES.control, label: i.imgControl, wide: false },
-    { src: IMAGES.hotel, label: i.imgHotel, wide: true },
-    { src: IMAGES.parking, label: i.imgParking, wide: false },
+    { src: IMAGES.lobby, label: i.imgLobby },
+    { src: IMAGES.camera, label: i.imgCamera },
+    { src: IMAGES.corridor, label: i.imgCorridor },
+    { src: IMAGES.control, label: i.imgControl },
+    { src: IMAGES.hotel, label: i.imgHotel },
+    { src: IMAGES.parking, label: i.imgParking },
   ];
 
   return (
     <div className="intro-page">
       <section className="intro-hero" aria-label={i.heroAlt}>
-        <img
-          src={IMAGES.hero}
-          alt=""
-          className="intro-hero-img"
-          loading="eager"
-          draggable={false}
-        />
+        <img src={IMAGES.hero} alt="" className="intro-hero-img" loading="eager" draggable={false} />
         <div className="intro-hero-overlay" />
         <div className="intro-hero-content">
-          <div className="intro-badges">
-            <span className="intro-badge">
-              <MapPin size={12} />
-              {i.eyebrow}
-            </span>
-            <span className="intro-badge soft">Milestone + AI</span>
-            <span className="intro-badge soft">Safire ONVIF</span>
-          </div>
+          <p className="intro-eyebrow">{i.eyebrow}</p>
           <h1>{i.title}</h1>
           <p className="intro-sub">{i.subtitle}</p>
           <div className="intro-actions">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => onNavigate('operations')}
-            >
+            <button type="button" className="btn btn-primary" onClick={() => onNavigate('operations')}>
               {i.ctaOps}
               <ArrowRight size={16} />
             </button>
@@ -102,9 +84,7 @@ export function Dashboard({ onNavigate }: Props) {
           <span>Safire E1</span>
         </div>
         <div className="intro-kpi-card">
-          <strong>
-            {online}/30
-          </strong>
+          <strong>{online}/30</strong>
           <span>{t.online}</span>
         </div>
         <div className="intro-kpi-card">
@@ -125,9 +105,9 @@ export function Dashboard({ onNavigate }: Props) {
           {features.map((f) => {
             const Icon = f.icon;
             return (
-              <article key={f.title} className={`intro-feature tone-${f.tone}`}>
+              <article key={f.title} className="intro-feature">
                 <div className="intro-feature-icon">
-                  <Icon size={18} />
+                  <Icon size={16} />
                 </div>
                 <h3>{f.title}</h3>
                 <p>{f.body}</p>
@@ -143,10 +123,7 @@ export function Dashboard({ onNavigate }: Props) {
         </div>
         <div className="intro-gallery">
           {gallery.map((g) => (
-            <figure
-              key={g.src}
-              className={`intro-gallery-item ${g.wide ? 'wide' : ''}`}
-            >
+            <figure key={g.src} className="intro-gallery-item">
               <img src={g.src} alt={g.label} loading="lazy" draggable={false} />
               <figcaption>{g.label}</figcaption>
             </figure>

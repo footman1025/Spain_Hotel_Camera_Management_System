@@ -19,26 +19,23 @@ export function GdprPage() {
       icon: Clock3,
       title: g.retentionTitle,
       items: [g.retention1, g.retention2, g.retention3],
-      accent: 'teal',
     },
     {
       icon: EyeOff,
       title: g.maskTitle,
       items: [g.mask1, g.mask2, g.mask3],
-      accent: 'blue',
     },
     {
       icon: ScanFace,
       title: g.facialTitle,
       items: [g.facial1, g.facial2, g.facial3, g.facial4],
-      accent: 'amber',
     },
   ];
 
   const roles = [
-    { name: g.roleAdmin, desc: g.roleAdminDesc, level: 'full' },
-    { name: g.roleSecurity, desc: g.roleSecurityDesc, level: 'mid' },
-    { name: g.roleReception, desc: g.roleReceptionDesc, level: 'low' },
+    { name: g.roleAdmin, desc: g.roleAdminDesc },
+    { name: g.roleSecurity, desc: g.roleSecurityDesc },
+    { name: g.roleReception, desc: g.roleReceptionDesc },
   ];
 
   const docs = [g.docs1, g.docs2, g.docs3, g.docs4, g.docs5];
@@ -50,12 +47,11 @@ export function GdprPage() {
           <div className="gdpr-badges">
             <span className="gdpr-badge">{g.badgeSpain}</span>
             <span className="gdpr-badge">{g.badgePrivacy}</span>
-            <span className="gdpr-badge">{g.badgeHotel}</span>
           </div>
           <h1>{g.title}</h1>
           <p>{g.subtitle}</p>
           <div className="gdpr-status">
-            <ShieldCheck size={16} />
+            <ShieldCheck size={15} />
             {g.statusOk}
           </div>
         </div>
@@ -83,17 +79,17 @@ export function GdprPage() {
         {pillars.map((pillar) => {
           const Icon = pillar.icon;
           return (
-            <article key={pillar.title} className={`gdpr-pillar accent-${pillar.accent}`}>
+            <article key={pillar.title} className="gdpr-pillar">
               <div className="gdpr-pillar-head">
                 <div className="gdpr-pillar-icon">
-                  <Icon size={18} />
+                  <Icon size={16} />
                 </div>
                 <h2>{pillar.title}</h2>
               </div>
               <ul className="gdpr-check-list">
                 {pillar.items.map((item) => (
                   <li key={item}>
-                    <CheckCircle2 size={15} />
+                    <CheckCircle2 size={14} />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -106,7 +102,7 @@ export function GdprPage() {
       <section className="gdpr-access panel">
         <div className="gdpr-section-head">
           <div className="gdpr-pillar-icon">
-            <UsersRound size={18} />
+            <UsersRound size={16} />
           </div>
           <div>
             <h2>{g.accessTitle}</h2>
@@ -115,10 +111,10 @@ export function GdprPage() {
         </div>
         <div className="gdpr-roles">
           {roles.map((role) => (
-            <div key={role.name} className={`gdpr-role level-${role.level}`}>
+            <div key={role.name} className="gdpr-role">
               <div className="gdpr-role-top">
                 <strong>{role.name}</strong>
-                <BadgeCheck size={16} />
+                <BadgeCheck size={15} color="var(--accent)" />
               </div>
               <p>{role.desc}</p>
             </div>
@@ -129,7 +125,7 @@ export function GdprPage() {
       <section className="gdpr-docs panel">
         <div className="gdpr-section-head">
           <div className="gdpr-pillar-icon">
-            <FileCheck2 size={18} />
+            <FileCheck2 size={16} />
           </div>
           <div>
             <h2>{g.docsTitle}</h2>
