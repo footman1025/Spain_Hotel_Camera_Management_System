@@ -91,7 +91,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     const item: DetectionOverlay = {
       ...overlay,
       id: uid('ov'),
-      expiresAt: Date.now() + (overlay.ttl ?? 4000),
+      expiresAt: Date.now() + (overlay.ttl ?? 10000),
     };
     setOverlays((prev) => [...prev.filter((o) => o.expiresAt > Date.now()), item]);
   }, []);
@@ -286,16 +286,28 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     const t = window.setInterval(() => {
       setOverlays((prev) => {
         if (prev.length === 0) return prev;
-        const next = prev.filter((o) => o.expiresAt > Date.now());
-        return next.length === prev.length ? prev : next;
+        const now = Date.now();
+        const next = prev
+          .filter((o) => o.expiresAt > now)
+          .map((o) =>
+            o.kind === 'face'
+              ? {
+                  ...o,
+                  x: Math.min(75, Math.max(10, o.x + (Math.random() - 0.5) * 1.6)),
+                  y: Math.min(55, Math.max(10, o.y + (Math.random() - 0.5) * 1.2)),
+                }
+              : o,
+          );
+        return next.length === 0 && prev.length === 0 ? prev : next;
       });
-    }, 500);
+    }, 200);
     return () => window.clearInterval(t);
   }, []);
 
   // Keep simulator callbacks/data in refs so the interval is not restarted every render
   const camerasRef = useRef(cameras);
   const peopleRef = useRef(people);
+  const selectedCameraIdRef = useRef(selectedCameraId);
   const emitFaceMatchRef = useRef(emitFaceMatch);
   const emitUnknownFaceRef = useRef(emitUnknownFace);
   const emitLineCrossRef = useRef(emitLineCross);
@@ -304,11 +316,12 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     camerasRef.current = cameras;
     peopleRef.current = people;
+    selectedCameraIdRef.current = selectedCameraId;
     emitFaceMatchRef.current = emitFaceMatch;
     emitUnknownFaceRef.current = emitUnknownFace;
     emitLineCrossRef.current = emitLineCross;
     pushEventRef.current = pushEvent;
-  }, [cameras, people, emitFaceMatch, emitUnknownFace, emitLineCross, pushEvent]);
+  }, [cameras, people, selectedCameraId, emitFaceMatch, emitUnknownFace, emitLineCross, pushEvent]);
 
   useEffect(() => {
     if (!simulatorRunning || scenarioActive) return;
@@ -321,17 +334,23 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       const online = currentCameras.filter((c) => c.status !== 'offline');
       if (!online.length) return;
 
-      const cam = online[Math.floor(Math.random() * online.length)];
+      // Bias events toward the selected live camera so overlays stay visible there
+      const selectedId = selectedCameraIdRef.current;
+      const selected = currentCameras.find((c) => c.id === selectedId && c.status !== 'offline');
+      const cam =
+        selected && Math.random() < 0.65
+          ? selected
+          : online[Math.floor(Math.random() * online.length)];
       const roll = Math.random();
 
-      if (roll < 0.35) {
+      if (roll < 0.4) {
         const person = currentPeople[Math.floor(Math.random() * currentPeople.length)];
         if (person) emitFaceMatchRef.current(person, cam);
-      } else if (roll < 0.55) {
+      } else if (roll < 0.6) {
         emitUnknownFaceRef.current(cam);
-      } else if (roll < 0.8 && cam.hasLine) {
+      } else if (roll < 0.85 && cam.hasLine) {
         emitLineCrossRef.current(cam, Math.random() > 0.7);
-      } else if (roll < 0.9) {
+      } else if (roll < 0.92) {
         if (
           currentCameras.some((c) => c.id === 'cam-30' && c.status === 'offline') &&
           Math.random() > 0.5
@@ -362,7 +381,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
           });
         }
       }
-    }, 4000 / speed);
+    }, 3200 / speed);
 
     return () => window.clearInterval(interval);
   }, [scenarioActive, simulatorRunning, speed]);
