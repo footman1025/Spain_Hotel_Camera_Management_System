@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   ArrowRight,
   Video,
+  Server,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -14,12 +15,9 @@ import { useDemo } from '../store/DemoContext';
 
 const IMAGES = {
   hero: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1800&q=80',
-  lobby: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=900&q=80',
-  camera: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=900&q=80',
-  corridor: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80',
-  control: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=900&q=80',
-  hotel: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=900&q=80',
-  parking: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=900&q=80',
+  lobby: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1000&q=80',
+  camera: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=1000&q=80',
+  corridor: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=80',
 };
 
 export function Dashboard() {
@@ -44,16 +42,20 @@ export function Dashboard() {
     { icon: ShieldCheck, title: i.feature6Title, body: i.feature6Body },
   ];
 
+  const stack = [i.stack1, i.stack2, i.stack3, i.stack4, i.stack5, i.stack6];
+
   const gallery = [
     { src: IMAGES.lobby, label: i.imgLobby },
     { src: IMAGES.camera, label: i.imgCamera },
     { src: IMAGES.corridor, label: i.imgCorridor },
-    { src: IMAGES.control, label: i.imgControl },
-    { src: IMAGES.hotel, label: i.imgHotel },
-    { src: IMAGES.parking, label: i.imgParking },
   ];
 
-  const phases = [i.phase1, i.phase2, i.phase3, i.phase4, i.phase5];
+  const stats = [
+    { value: '30', label: 'Safire E1' },
+    { value: `${online}/30`, label: t.online },
+    { value: String(activeRules), label: t.ops.activeRules },
+    { value: 'VMS', label: 'Milestone + AI' },
+  ];
 
   return (
     <div className="intro-page">
@@ -66,7 +68,7 @@ export function Dashboard() {
           draggable={false}
         />
         <div className="intro-hero-overlay" />
-        <div className="intro-hero-grid">
+        <div className="intro-hero-content">
           <div className="intro-hero-copy">
             <p className="intro-kicker">{i.eyebrow}</p>
             <h1>{i.title}</h1>
@@ -86,45 +88,28 @@ export function Dashboard() {
               </button>
             </div>
           </div>
-          <div className="intro-hero-side">
-            <div className="intro-hero-stat">
-              <strong>30</strong>
-              <span>Safire E1</span>
-            </div>
-            <div className="intro-hero-stat">
-              <strong>
-                {online}/30
-              </strong>
-              <span>{t.online}</span>
-            </div>
-            <div className="intro-hero-stat">
-              <strong>{activeRules}</strong>
-              <span>{t.ops.activeRules}</span>
-            </div>
-            <div className="intro-hero-stat">
-              <strong>VMS</strong>
-              <span>Milestone + AI</span>
-            </div>
-          </div>
+
+          <ul className="intro-stat-row" aria-label="System status">
+            {stats.map((s) => (
+              <li key={s.label} className="intro-stat">
+                <strong>{s.value}</strong>
+                <span>{s.label}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="intro-split">
-        <article className="panel intro-block">
-          <h2>{i.overviewTitle}</h2>
-          <p>{i.overviewBody}</p>
-        </article>
-        <article className="panel intro-block">
-          <h2>{i.phasesTitle}</h2>
-          <ol className="intro-phases">
-            {phases.map((phase, index) => (
-              <li key={phase}>
-                <span>{index + 1}</span>
-                {phase}
-              </li>
-            ))}
-          </ol>
-        </article>
+      <section className="intro-stack" aria-label={i.stackTitle}>
+        <div className="intro-stack-label">
+          <Server size={15} />
+          <span>{i.stackTitle}</span>
+        </div>
+        <ul className="intro-stack-list">
+          {stack.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
       </section>
 
       <section className="intro-section">
@@ -136,11 +121,11 @@ export function Dashboard() {
             const Icon = f.icon;
             return (
               <article key={f.title} className="intro-feature">
-                <Icon size={18} className="intro-feature-icon" />
-                <div>
-                  <h3>{f.title}</h3>
-                  <p>{f.body}</p>
+                <div className="intro-feature-icon" aria-hidden>
+                  <Icon size={18} />
                 </div>
+                <h3>{f.title}</h3>
+                <p>{f.body}</p>
               </article>
             );
           })}
