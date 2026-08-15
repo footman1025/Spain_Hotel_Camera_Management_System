@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { FEED_IMAGES } from '../data/feedImages';
@@ -40,6 +40,31 @@ function LiveClock({ active }: { active: boolean }) {
   return <span className="cam-ts">{ts}</span>;
 }
 
+/** Stable image layer — never remounts when overlays / tracks update */
+const FeedBackground = memo(function FeedBackground({
+  src,
+  large,
+  offline,
+}: {
+  src: string;
+  large?: boolean;
+  offline: boolean;
+}) {
+  if (offline) return null;
+
+  return (
+    <img
+      className={`feed-bg-img ${large ? 'feed-bg-live' : ''}`}
+      src={src}
+      alt=""
+      loading="eager"
+      decoding="async"
+      draggable={false}
+      // Local asset — do not tear down the node on transient errors
+    />
+  );
+});
+
 function CameraFeedComponent({
   camera,
   overlays = [],
@@ -51,14 +76,8 @@ function CameraFeedComponent({
   const camOverlays = overlays.filter((o) => o.cameraId === camera.id);
   const bgImage = FEED_IMAGES[camera.zone] ?? FEED_IMAGES.lobby;
   const offline = camera.status === 'offline';
-  const [imgFailed, setImgFailed] = useState(false);
   const [tracks, setTracks] = useState<LiveTrack[]>([]);
 
-  useEffect(() => {
-    setImgFailed(false);
-  }, [bgImage, camera.id]);
-
-  // Continuous moving detections on the main live feed (and selected thumbs)
   useEffect(() => {
     if (offline || (!large && !selected)) {
       setTracks([]);
@@ -96,37 +115,24 @@ function CameraFeedComponent({
     const timer = window.setInterval(() => {
       setTracks((prev) =>
         prev.map((t) => {
-          let { x, y, vx, vy, w, h } = t;
+          let { x, y, vx, vy } = t;
           x += vx;
           y += vy;
           if (x < 8 || x > 78) vx = -vx;
           if (y < 12 || y > 62) vy = -vy;
           x = Math.min(78, Math.max(8, x));
           y = Math.min(62, Math.max(12, y));
-          // tiny jitter so it feels live
           vx += (Math.random() - 0.5) * 0.02;
           vy += (Math.random() - 0.5) * 0.015;
           vx = Math.max(-0.35, Math.min(0.35, vx));
           vy = Math.max(-0.25, Math.min(0.25, vy));
-          return { ...t, x, y, w, h, vx, vy };
+          return { ...t, x, y, vx, vy };
         }),
       );
-    }, 80);
+    }, 100);
 
     return () => window.clearInterval(timer);
   }, [camera.id, large, offline, selected]);
-
-  const feedStyle = useMemo(
-    () =>
-      !offline
-        ? ({
-            backgroundImage: `linear-gradient(180deg, rgba(8,10,14,0.15), rgba(8,10,14,0.45)), url(${bgImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          } as const)
-        : undefined,
-    [bgImage, offline],
-  );
 
   return (
     <div
@@ -135,21 +141,8 @@ function CameraFeedComponent({
       role={onClick ? 'button' : undefined}
       style={large ? { aspectRatio: '16/9', width: '100%', minHeight: 280 } : undefined}
     >
-      <div
-        className={`camera-feed ${camera.zone} ${offline ? 'offline' : ''} ${large ? 'live-motion' : ''}`}
-        style={feedStyle}
-      >
-        {!offline && !imgFailed && (
-          <img
-            className="feed-bg-img"
-            src={bgImage}
-            alt=""
-            loading={large ? 'eager' : 'lazy'}
-            decoding="async"
-            draggable={false}
-            onError={() => setImgFailed(true)}
-          />
-        )}
+      <div className={`camera-feed ${camera.zone} ${offline ? 'offline' : ''} ${large ? 'live-motion' : ''}`}>
+        <FeedBackground src={bgImage} large={large} offline={offline} />
         <div className="feed-dim" />
         <div className="feed-noise" />
         {large && !offline && <div className="feed-scan" aria-hidden />}

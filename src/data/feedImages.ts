@@ -1,22 +1,13 @@
+/** Local feed assets — remote Unsplash URLs caused buffering / black screens when CDN stalled. */
 export const FEED_IMAGES: Record<string, string> = {
-  lobby:
-    'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=70',
-  reception:
-    'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=70',
-  corridor:
-    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=70',
-  elevator:
-    'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=70',
-  parking:
-    'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=70',
-  restaurant:
-    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=70',
-  pool:
-    'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1200&q=70',
-  room_door:
-    'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1200&q=70',
-  stairwell:
-    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=70',
-  common:
-    'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=70',
+  lobby: '/feeds/lobby.jpg',
+  reception: '/feeds/reception.jpg',
+  corridor: '/feeds/corridor.jpg',
+  elevator: '/feeds/elevator.jpg',
+  parking: '/feeds/parking.jpg',
+  restaurant: '/feeds/restaurant.jpg',
+  pool: '/feeds/pool.jpg',
+  room_door: '/feeds/room_door.jpg',
+  stairwell: '/feeds/stairwell.jpg',
+  common: '/feeds/common.jpg',
 };
