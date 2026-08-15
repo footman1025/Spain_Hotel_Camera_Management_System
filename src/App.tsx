@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { DemoProvider } from './store/DemoContext';
 import { LanguageProvider } from './i18n/LanguageContext';
-import type { PageId } from './types';
 import { Dashboard } from './pages/Dashboard';
 import { Operations } from './pages/Operations';
 import { LiveView } from './pages/LiveView';
@@ -12,28 +11,26 @@ import { Alerts } from './pages/Alerts';
 import { SearchPage } from './pages/Search';
 import { GdprPage } from './pages/GdprPage';
 
-function AppInner() {
-  const [page, setPage] = useState<PageId>('dashboard');
-
-  return (
-    <Layout page={page} onNavigate={setPage}>
-      {page === 'dashboard' && <Dashboard onNavigate={setPage} />}
-      {page === 'operations' && <Operations />}
-      {page === 'live' && <LiveView />}
-      {page === 'watchlists' && <Watchlists />}
-      {page === 'rules' && <Rules />}
-      {page === 'alerts' && <Alerts />}
-      {page === 'search' && <SearchPage />}
-      {page === 'gdpr' && <GdprPage />}
-    </Layout>
-  );
-}
-
 export default function App() {
   return (
     <LanguageProvider>
       <DemoProvider>
-        <AppInner />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="operations" element={<Operations />} />
+              <Route path="live" element={<LiveView />} />
+              <Route path="watchlists" element={<Watchlists />} />
+              <Route path="rules" element={<Rules />} />
+              <Route path="alerts" element={<Alerts />} />
+              <Route path="search" element={<SearchPage />} />
+              <Route path="gdpr" element={<GdprPage />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
       </DemoProvider>
     </LanguageProvider>
   );

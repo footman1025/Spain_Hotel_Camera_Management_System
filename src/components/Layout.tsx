@@ -1,3 +1,4 @@
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Monitor,
@@ -10,7 +11,6 @@ import {
   Zap,
   Languages,
 } from 'lucide-react';
-import type { ReactNode } from 'react';
 import type { PageId } from '../types';
 import { useDemo } from '../store/DemoContext';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -38,16 +38,25 @@ const NAV_ORDER: PageId[] = [
   'gdpr',
 ];
 
-interface Props {
-  page: PageId;
-  onNavigate: (p: PageId) => void;
-  children: ReactNode;
-}
+const PATH_TO_PAGE: Record<string, PageId> = {
+  '/': 'dashboard',
+  '/dashboard': 'dashboard',
+  '/operations': 'operations',
+  '/live': 'live',
+  '/watchlists': 'watchlists',
+  '/rules': 'rules',
+  '/alerts': 'alerts',
+  '/search': 'search',
+  '/gdpr': 'gdpr',
+};
 
-export function Layout({ page, onNavigate, children }: Props) {
+export function Layout() {
   const { t, lang, setLang } = useLanguage();
   const { unreadCritical, scenarioActive, scenarioKey, cameras } = useDemo();
+  const location = useLocation();
+  const navigate = useNavigate();
 
+  const page = PATH_TO_PAGE[location.pathname] ?? 'dashboard';
   const online = cameras.filter((c) => c.status !== 'offline').length;
   const scenarioLabel =
     scenarioKey && scenarioKey in t.events
@@ -61,7 +70,7 @@ export function Layout({ page, onNavigate, children }: Props) {
           <button
             type="button"
             className="brand-title"
-            onClick={() => onNavigate('dashboard')}
+            onClick={() => navigate('/dashboard')}
             title={t.brandTitle}
           >
             {t.brandTitle}
@@ -71,19 +80,20 @@ export function Layout({ page, onNavigate, children }: Props) {
         <nav className="nav">
           {NAV_ORDER.map((id) => {
             const Icon = NAV_ICONS[id];
+            const to = id === 'dashboard' ? '/dashboard' : `/${id}`;
             return (
-              <button
+              <NavLink
                 key={id}
-                type="button"
-                className={`nav-item ${page === id ? 'active' : ''}`}
-                onClick={() => onNavigate(id)}
+                to={to}
+                end={id === 'dashboard'}
+                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               >
                 <Icon size={16} />
                 {t.nav[id]}
                 {id === 'alerts' && unreadCritical > 0 && (
                   <span className="nav-badge">{unreadCritical}</span>
                 )}
-              </button>
+              </NavLink>
             );
           })}
         </nav>
@@ -127,7 +137,7 @@ export function Layout({ page, onNavigate, children }: Props) {
             {scenarioLabel || t.scenarioStarting}
           </div>
         )}
-        {children}
+        <Outlet />
       </main>
       <ToastStack />
     </div>

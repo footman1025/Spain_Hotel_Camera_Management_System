@@ -8,9 +8,9 @@ import {
   ArrowRight,
   Video,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useDemo } from '../store/DemoContext';
-import type { PageId } from '../types';
 
 const IMAGES = {
   hero: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1800&q=80',
@@ -22,11 +22,8 @@ const IMAGES = {
   parking: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=900&q=80',
 };
 
-interface Props {
-  onNavigate: (page: PageId) => void;
-}
-
-export function Dashboard({ onNavigate }: Props) {
+export function Dashboard() {
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const { cameras, rules, setSelectedCameraId } = useDemo();
   const i = t.intro;
@@ -35,7 +32,7 @@ export function Dashboard({ onNavigate }: Props) {
 
   const openLive = () => {
     setSelectedCameraId('cam-01');
-    onNavigate('live');
+    navigate('/live');
   };
 
   const features = [
@@ -78,7 +75,7 @@ export function Dashboard({ onNavigate }: Props) {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => onNavigate('operations')}
+                onClick={() => navigate('/operations')}
               >
                 {i.ctaOps}
                 <ArrowRight size={16} />
